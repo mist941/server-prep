@@ -6,9 +6,10 @@
   user:
     name: "{{ NEW_USER }}"
     state: present
-    groups: sudo 
+    groups: sudo
     append: true
     password: "{{ hashed_password }}"
+    comment: ""
 
 - name: Configure sudo privileges for new user
   copy:
@@ -22,6 +23,8 @@
     path: "/home/{{ NEW_USER }}/.ssh"
     state: directory
     mode: '0700'
+    owner: "{{ NEW_USER }}"
+    group: "{{ NEW_USER }}"
 
 - name: Add SSH key to authorized_keys
   authorized_key:
