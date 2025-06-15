@@ -4,7 +4,7 @@
 
 - name: Add user
   user:
-    name: "{{ NEW_USER_NAME }}"
+    name: "{{ NEW_USER }}"
     state: present
     groups: sudo 
     append: true
@@ -12,19 +12,19 @@
 
 - name: Configure sudo privileges for new user
   copy:
-    dest: /etc/sudoers.d/{{ NEW_USER_NAME }}
-    content: "{{ NEW_USER_NAME }} ALL=(ALL) ALL"
+    dest: /etc/sudoers.d/{{ NEW_USER }}
+    content: "{{ NEW_USER }} ALL=(ALL) ALL"
     mode: '0440'
     validate: /usr/sbin/visudo -cf %s
 
 - name: Create .ssh directory
   file:
-    path: "/home/{{ NEW_USER_NAME }}/.ssh"
+    path: "/home/{{ NEW_USER }}/.ssh"
     state: directory
     mode: '0700'
 
 - name: Add SSH key to authorized_keys
   authorized_key:
-    user: "{{ NEW_USER_NAME }}"
+    user: "{{ NEW_USER }}"
     key: "{{ SSH_PUB_KEY }}"
     state: present
