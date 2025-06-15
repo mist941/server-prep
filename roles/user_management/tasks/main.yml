@@ -2,6 +2,11 @@
   set_fact:
     hashed_password: "{{ NEW_USER_PASSWORD | password_hash('sha512') }}"
 
+- name: Create group
+  group:
+    name: admin
+    state: present
+
 - name: Add user
   user:
     name: "{{ NEW_USER }}"
@@ -10,6 +15,9 @@
     append: true
     password: "{{ hashed_password }}"
     comment: ""
+    shell: /bin/bash
+    create_home: true
+    skeleton: /etc/skel
 
 - name: Create .ssh directory
   file:
