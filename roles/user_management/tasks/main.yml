@@ -32,5 +32,4 @@
     user: "{{ NEW_USER }}"
     key: "{{ SSH_PUB_KEY }}"
     state: present
-    path: "/home/{{ NEW_USER }}/.ssh/authorized_keys"
     manage_dir: true
