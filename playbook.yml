@@ -3,6 +3,7 @@
 
   roles:
     - { role: system_updates, tags: ['system', 'updates']}
+    - { role: time_configuration, tags: ['time']}
 
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"

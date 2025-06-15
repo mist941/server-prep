@@ -1,0 +1,14 @@
+- name: Set timezone to whatever set in the .env file
+  timezone:
+    name: "{{ TIMEZONE }}"
+
+- name: Install chrony for time synchronization
+  apt:
+    name: chrony
+    state: present
+
+- name: Enable and start chrony service
+  service:
+    name: chrony
+    state: started
+    enabled: yes
