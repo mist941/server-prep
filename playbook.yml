@@ -1,0 +1,13 @@
+- name: Prepare the server
+  hosts: servers
+
+  roles:
+    - { role: system_update, tags: ['system', 'updates']}
+
+  vars:
+    ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"
+    ANSIBLE_PASSWORD: "{{ lookup('env', 'ANSIBLE_PASSWORD') }}"
+    NEW_USER: "{{ lookup('env', 'NEW_USER') }}"
+    NEW_USER_PASSWORD: "{{ lookup('env', 'NEW_USER_PASSWORD') }}"
+    SSH_PUB_KEY: "{{ lookup('env', 'SSH_PUB_KEY') }}"
+    TIMEZONE: "{{ lookup('env', 'TIMEZONE') }}"
