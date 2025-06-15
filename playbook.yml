@@ -4,6 +4,8 @@
   roles:
     - { role: system_updates, tags: ['system', 'updates']}
     - { role: time_configuration, tags: ['time']}
+    - { role: user_management, tags: ['user']}
+    - { role: bash_config, tags: ['bash']}
 
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"

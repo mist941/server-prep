@@ -1,0 +1,30 @@
+- name: Generate password hash
+  set_fact:
+    hashed_password: "{{ NEW_USER_PASSWORD | password_hash('sha512') }}"
+
+- name: Add user
+  user:
+    name: "{{ NEW_USER_NAME }}"
+    state: present
+    groups: sudo 
+    append: true
+    password: "{{ hashed_password }}"
+
+- name: Configure sudo privileges for new user
+  copy:
+    dest: /etc/sudoers.d/{{ NEW_USER_NAME }}
+    content: "{{ NEW_USER_NAME }} ALL=(ALL) ALL"
+    mode: '0440'
+    validate: /usr/sbin/visudo -cf %s
+
+- name: Create .ssh directory
+  file:
+    path: "/home/{{ NEW_USER_NAME }}/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: Add SSH key to authorized_keys
+  authorized_key:
+    user: "{{ NEW_USER_NAME }}"
+    key: "{{ SSH_PUB_KEY }}"
+    state: present
