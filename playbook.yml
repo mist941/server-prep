@@ -2,7 +2,7 @@
   hosts: servers
 
   roles:
-    - { role: system_update, tags: ['system', 'updates']}
+    - { role: system_updates, tags: ['system', 'updates']}
 
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"
