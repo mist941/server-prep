@@ -6,22 +6,16 @@
   user:
     name: "{{ NEW_USER }}"
     state: present
-    groups: sudo
+    groups: [sudo, admin]
     append: true
     password: "{{ hashed_password }}"
     comment: ""
-
-- name: Configure sudo privileges for new user
-  copy:
-    dest: /etc/sudoers.d/{{ NEW_USER }}
-    content: "{{ NEW_USER }} ALL=(ALL) ALL"
-    mode: '0440'
-    validate: /usr/sbin/visudo -cf %s
 
 - name: Create .ssh directory
   file:
     path: "/home/{{ NEW_USER }}/.ssh"
     state: directory
+    group: admin
     mode: '0700'
     owner: "{{ NEW_USER }}"
 
