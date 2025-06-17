@@ -24,3 +24,19 @@
     owner: "{{ NEW_USER }}"
     group: admin
     mode: '0755'
+
+- name: Download VimPlug
+  get_url:
+    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    dest: "/home/{{ NEW_USER }}/.vim/autoload/plug.vim"
+    owner: "{{ NEW_USER }}"
+    group: admin
+    mode: '0644'
+
+- name: Create custom .vimrc for {{ NEW_USER }} user
+  template:
+    src: vimrc.j2
+    dest: "/home/{{ NEW_USER }}/.vimrc"
+    owner: "{{ NEW_USER }}"
+    group: admin
+    mode: '0644'
