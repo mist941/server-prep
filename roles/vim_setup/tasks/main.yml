@@ -40,3 +40,15 @@
     owner: "{{ NEW_USER }}"
     group: admin
     mode: '0644'
+
+- name: Create vim configuration for sudo
+  template:
+    src: vimrc.j2
+    dest: /etc/vim/vimrc.local
+    mode: '0644'
+
+- name: Install Vim plugins
+  command: vim +PlugInstall +qall
+  args:
+    creates: "/home/{{ NEW_USER }}/.vim/plugged"
+  become_user: "{{ NEW_USER }}"
