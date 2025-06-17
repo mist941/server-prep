@@ -27,9 +27,12 @@
     mode: '0700'
     owner: "{{ NEW_USER }}"
 
+- name: Show SSH key
+  debug:
+    var: SSH_PUB_KEY
+
 - name: Add SSH key to authorized_keys
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ NEW_USER }}"
     key: "{{ SSH_PUB_KEY }}"
     state: present
-    manage_dir: true
