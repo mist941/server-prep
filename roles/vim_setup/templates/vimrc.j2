@@ -1,34 +1,78 @@
 " Common adjustments
-set nocompatible          " Turn off compatible with vi mod
-set number			          " Show line numbers
-syntax on			            " Turn on syntax highlighting
-set tabstop=4			        " 4 spaces for tabs
-set shiftwidth=4		      " 4 spaces for auto indents
-set expandtab			        " Replace tabs with spaces
-set autoindent			      " Auto indents
-set smartindent			      " Smart indents
-set cursorline			      " Highlight current line
-set wildmenu			        " Enable suggestions
-set clipboard=unnamedplus	" Sync with the system buffer
-set mouse=a			          " Enable mouse
+set nocompatible          " Turn off compatible with vi mode
+set number               " Show line numbers
+set relativenumber       " Show relative line numbers
+syntax on                " Turn on syntax highlighting
+set tabstop=4            " 4 spaces for tabs
+set shiftwidth=4         " 4 spaces for auto indents
+set expandtab            " Replace tabs with spaces
+set autoindent           " Auto indents
+set smartindent          " Smart indents
+set cursorline           " Highlight current line
+set wildmenu             " Enable suggestions
+set clipboard=unnamedplus " Sync with the system buffer
+set mouse=a              " Enable mouse
+set encoding=utf-8       " Set encoding to UTF-8
+set fileencoding=utf-8   " Set file encoding to UTF-8
+set termguicolors        " Enable true colors
+set background=dark      " Set dark background
 
 " Plugins
 call plug#begin('~/.vim/plugged')
 
-Plug 'morhetz/gruvbox'                          " Theme
+" Theme
+Plug 'morhetz/gruvbox'
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " Autocomplete
+" Autocomplete and LSP
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-Plug 'preservim/nerdtree'                       " File manager
+" File manager
+Plug 'preservim/nerdtree'
 
-Plug 'dense-analysis/ale'                       " Code analyses:
+" Code analysis
+Plug 'dense-analysis/ale'
 
-Plug 'tpope/vim-fugitive'                       " Git
+" Git integration
+Plug 'tpope/vim-fugitive'
 
-Plug 'vim-airline/vim-airline'                  " Status bar
+" Status bar
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
 call plug#end()
 
-set background=dark
+" Load color scheme after plugins
+if has('termguicolors')
+  set termguicolors
+endif
 
-colorscheme gruvbox
+" Set color scheme if available
+if exists('g:loaded_gruvbox')
+  colorscheme gruvbox
+else
+  colorscheme default
+endif
+
+" Additional settings
+let g:airline_theme = 'gruvbox'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+
+" NERDTree settings
+let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
+
+" ALE settings
+let g:ale_sign_error = '✗'
+let g:ale_sign_warning = '⚠'
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_save = 1
+
+" COC settings
+let g:coc_global_extensions = [
+  \ 'coc-json',
+  \ 'coc-tsserver',
+  \ 'coc-python',
+  \ 'coc-rust-analyzer'
+  \ ]

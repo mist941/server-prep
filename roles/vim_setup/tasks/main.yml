@@ -19,7 +19,7 @@
 
 - name: Create autoload directory
   file:
-    path: "{{ NEW_USER }}/.vim/autoload"
+    path: "/home/{{ NEW_USER }}/.vim/autoload"
     state: directory
     owner: "{{ NEW_USER }}"
     group: admin
@@ -51,4 +51,3 @@
   command: vim +PlugInstall +qall
   args:
     creates: "/home/{{ NEW_USER }}/.vim/plugged"
-  become_user: "{{ NEW_USER }}"
