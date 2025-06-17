@@ -6,4 +6,9 @@ set +a
 TAGS=$1
 
 echo "Starting Ansible playbook execution"
-ansible-playbook -i inventory.ini playbook.yml --tags $TAGS
+
+if [ -z "$TAGS" ]; then
+  ansible-playbook -i inventory.ini playbook.yml
+else
+  ansible-playbook -i inventory.ini playbook.yml --tags $TAGS
+fi
