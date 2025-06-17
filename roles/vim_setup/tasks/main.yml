@@ -9,3 +9,18 @@
     name: vim
     state: present
   when: vim_check.rc != 0
+
+- name: Create .vim directory
+  file:
+    path: "/home/{{ NEW_USER }}/.vim"
+    state: directory
+    mode: '0700'
+    owner: "{{ NEW_USER }}"
+
+- name: Create autoload directory
+  file:
+    path: "{{ NEW_USER }}/.vim/autoload"
+    state: directory
+    owner: "{{ NEW_USER }}"
+    group: admin
+    mode: '0755'
