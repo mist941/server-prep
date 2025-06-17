@@ -6,6 +6,7 @@
     - { role: time_configuration, tags: ['time']}
     - { role: user_management, tags: ['user']}
     - { role: bash_config, tags: ['bash']}
+    - { role: vim_setup, tags: ['vim']}
 
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"
