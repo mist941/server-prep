@@ -43,12 +43,8 @@ if has('termguicolors')
   set termguicolors
 endif
 
-" Set color scheme if available
-if exists('g:loaded_gruvbox')
-  colorscheme gruvbox
-else
-  colorscheme default
-endif
+" Set color scheme
+colorscheme gruvbox
 
 " Additional settings
 let g:airline_theme = 'gruvbox'
