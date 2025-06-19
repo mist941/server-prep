@@ -1,0 +1,17 @@
+- name: Configure secure SSH configuration
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - regexp: "^PermitRootLogin"
+      line: "PermitRootLogin no"
+    - regexp: "^PasswordAuthentication"
+      line: "PasswordAuthentication no"
+    - regexp: "^ChallengeResponseAuthentication"
+      line: "ChallengeResponseAuthentication no"
+    - regexp: "^UsePAM"
+      line: "UsePAM no"
+    - regexp: "^PubkeyAuthentication"
+      line: "PubkeyAuthentication no"

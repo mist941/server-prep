@@ -8,6 +8,7 @@
     - { role: bash_config, tags: ['bash']}
     - { role: vim_setup, tags: ['vim']}
     - { role: packages_installation, tags: ['packages']}
+    - { role: ssh_setup, tags: ['ssh']}
 
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"
