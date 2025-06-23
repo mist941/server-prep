@@ -1,140 +1,177 @@
-# Server Preparation Ansible Project
+# Server Preparation with Ansible
 
-Basic Ansible automation for initial server setup. Configures essential components such as users, SSH, system updates, and common tools. Designed to work across various Linux hosts.
+This project contains an Ansible playbook for preparing and configuring Ubuntu servers.
 
-## 🚀 Features
+## Prerequisites
 
-- ✅ System updates and package upgrades
-- ✅ Timezone and time synchronization configuration
-- ✅ User management with SSH keys
-- ✅ Secure SSH configuration
-- ✅ Essential packages installation
-- ✅ Vim setup with plugins
-- ✅ Custom bash prompt configuration
+- Ansible must be installed on the local machine
+- SSH access to the target server
+- Python installed on the target server
 
-## 📋 Requirements
+## Quick Start
 
-- **Ansible**: >= 2.14
-- **Supported OS**: Ubuntu 20.04+, Debian 11+
-- **Access**: SSH or initial password access to target hosts
-
-## 🔧 Installation
-
-1. **Clone the repository:**
-```bash
-git clone <your-repo-url>
-cd server-prep
-```
-
-2. **Install required collections:**
-```bash
-ansible-galaxy collection install -r requirements.yml
-```
-
-3. **Configure environment variables:**
+1. Copy the configuration file:
 ```bash
 cp env.example .env
-# Edit the .env file with your values
 ```
 
-## ⚙️ Configuration
-
-### Required Environment Variables
-
-Create a `.env` file with the following variables:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `ANSIBLE_USER` | User for initial connection | `ubuntu` |
-| `ANSIBLE_PASSWORD` | Password for initial connection | `your_password` |
-| `NEW_USER` | Name of the new user to create | `admin` |
-| `NEW_USER_PASSWORD` | Password for the new user | `secure_password` |
-| `SSH_PUB_KEY` | SSH public key content | `ssh-rsa AAAAB3...` |
-| `TIMEZONE` | Timezone | `Europe/Kiev` |
-
-### Inventory Configuration
-
-Edit `inventory.ini` and add your servers:
-
-```ini
-[servers]
-192.168.1.10
-192.168.1.11
-example.com
-
-[servers:vars]
-ansible_user={{ lookup('env', 'ANSIBLE_USER') }}
-ansible_password={{ lookup('env', 'ANSIBLE_PASSWORD') }}
-ansible_become_password={{ lookup('env', 'ANSIBLE_PASSWORD') }}
+2. Edit the `.env` file with your settings:
+```bash
+nano .env
 ```
 
-## 🚀 Usage
+3. Update `inventory.ini` with your server's IP address
 
-### Full Deployment
+4. Run the playbook:
 ```bash
 ./run.sh
 ```
 
-### Selective Execution by Tags
+## Using the Enhanced run.sh Script
+
+The `run.sh` script has been significantly improved and now supports many useful features:
+
+### Basic Commands
+
 ```bash
-# System updates only
-./run.sh system,updates
+# Run the entire playbook
+./run.sh
 
-# SSH configuration only
-./run.sh ssh
+# Show help
+./run.sh --help
 
-# User and SSH configuration
-./run.sh user,ssh
+# Run only specific tags
+./run.sh -t system,updates
+
+# Check changes without applying (dry run)
+./run.sh --dry-run
+
+# Run in verbose mode
+./run.sh -v
+
+# Show all available tags
+./run.sh --list-tags
 ```
 
-### Dry Run (Check mode)
+### Script Features
+
+1. **Prerequisites Check**: Automatically checks for Ansible presence and required files
+2. **Environment Variables Validation**: Verifies that all required variables are set in `.env`
+3. **Colored Output**: Uses colors for better visual perception
+4. **Error Handling**: Stops on first error and shows clear error messages
+5. **Dry Run Mode**: Allows previewing changes without applying them
+6. **Verbose Mode**: Shows more information during execution
+7. **Tag Flexibility**: Easy to run only needed parts of the playbook
+
+### Available Tags
+
+- `system` - system updates
+- `updates` - install updates
+- `time` - timezone configuration
+- `user` - user management
+- `bash` - bash configuration
+- `vim` - vim setup
+- `packages` - package installation
+- `ssh` - SSH configuration
+
+## Roles
+
+This playbook includes the following roles:
+
+- **system_updates**: Update system packages
+- **time_configuration**: Configure timezone
+- **user_management**: Create and configure users
+- **bash_config**: Configure bash shell
+- **vim_setup**: Configure vim editor
+- **packages_installation**: Install additional packages
+- **ssh_setup**: Configure SSH and keys
+
+## Configuration
+
+All settings are stored in the `.env` file. Configuration example:
+
 ```bash
-ansible-playbook -i inventory.ini playbook.yml --check
+# Ansible Connection Settings
+ANSIBLE_USER=ubuntu
+ANSIBLE_PASSWORD=your_initial_password
+
+# New User Configuration
+NEW_USER=admin
+NEW_USER_PASSWORD=secure_password_here
+
+# SSH Public Key
+SSH_PUB_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ... your-email@example.com"
+
+# System Configuration
+TIMEZONE=Europe/Kiev
 ```
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
-├── ansible.cfg                 # Ansible configuration
-├── playbook.yml                # Main playbook
-├── inventory.ini               # Host inventory
-├── requirements.yml            # Collection dependencies
-├── .ansible-lint              # Linting configuration
-├── env.example                # Environment variables example
-├── run.sh                     # Launch script
-└── roles/                     # Ansible roles
-    ├── system_updates/        # System updates
-    ├── time_configuration/    # Time configuration
-    ├── user_management/       # User management
-    ├── ssh_setup/            # SSH configuration
-    ├── packages_installation/ # Package installation
-    ├── vim_setup/            # Vim configuration
-    └── bash_config/          # Bash configuration
+server-prep/
+├── run.sh              # Enhanced launch script
+├── playbook.yml        # Main playbook
+├── inventory.ini       # Inventory file
+├── .env               # Environment variables (create from env.example)
+├── env.example        # Environment variables example
+└── roles/             # Roles directory
+    ├── system_updates/
+    ├── time_configuration/
+    ├── user_management/
+    ├── bash_config/
+    ├── vim_setup/
+    ├── packages_installation/
+    └── ssh_setup/
 ```
 
-## 🏷️ Available Tags
+## Improvements in run.sh
 
-| Tag | Description |
-|-----|-------------|
-| `system`, `updates` | System updates |
-| `time` | Timezone configuration |
-| `user` | User management |
-| `ssh` | SSH configuration |
-| `packages` | Package installation |
-| `vim` | Vim configuration |
-| `bash` | Bash configuration |
+The new `run.sh` script has the following improvements compared to the original version:
 
-## 🔒 Security
+### 🔒 Security and Reliability
+- `set -euo pipefail` - stops on errors and uninitialized variables
+- Check for presence of all required files
+- Environment variables validation before execution
 
-- SSH root login disabled
-- Password authentication disabled
-- Key-based authentication only
-- User passwords hashed with SHA512
-- Sensitive data not logged
+### 🎨 User Interface
+- Colored output with different message levels (INFO, SUCCESS, WARNING, ERROR)
+- Detailed help with usage examples
+- Step-by-step execution messages
 
-## 📝 License
+### 🛠 Functionality
+- Support for multiple command line options
+- Dry run mode for safe checking
+- Verbose mode for detailed logging
+- Ability to view all available tags
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### 📊 Monitoring
+- Check for Ansible installation
+- Validation of all configuration files
+- Detailed error messages with resolution tips
+
+### 🔄 Backward Compatibility
+- Support for old syntax (passing tags as first argument)
+- All existing commands continue to work
+
+## Usage Examples
+
+```bash
+# Basic usage
+./run.sh
+
+# Run specific roles
+./run.sh -t user,ssh
+
+# Check changes without applying
+./run.sh --dry-run -t system
+
+# Detailed run with specific tags
+./run.sh -v -t packages,vim
+
+# View available tags
+./run.sh --list-tags
+```
 
 ---
 
