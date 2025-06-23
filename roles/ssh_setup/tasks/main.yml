@@ -14,4 +14,4 @@
     - regexp: "^UsePAM"
       line: "UsePAM no"
     - regexp: "^PubkeyAuthentication"
-      line: "PubkeyAuthentication no"
+      line: "PubkeyAuthentication yes"
