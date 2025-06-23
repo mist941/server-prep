@@ -10,27 +10,25 @@
     TIMEZONE: "UTC"
 
   tasks:
-    - name: Test system_updates role in check mode
-      ansible.builtin.include_role:
-        name: system_updates
-      check_mode: true
+    - name: Test all roles in check mode
+      block:
+        - name: Test system_updates role
+          ansible.builtin.include_role:
+            name: system_updates
 
-    - name: Test time_configuration role in check mode
-      ansible.builtin.include_role:
-        name: time_configuration
-      check_mode: true
+        - name: Test time_configuration role
+          ansible.builtin.include_role:
+            name: time_configuration
 
-    - name: Test packages_installation role in check mode
-      ansible.builtin.include_role:
-        name: packages_installation
-      check_mode: true
+        - name: Test packages_installation role
+          ansible.builtin.include_role:
+            name: packages_installation
 
-    - name: Test vim_setup role in check mode
-      ansible.builtin.include_role:
-        name: vim_setup
-      check_mode: true
+        - name: Test vim_setup role
+          ansible.builtin.include_role:
+            name: vim_setup
 
-    - name: Test bash_config role in check mode
-      ansible.builtin.include_role:
-        name: bash_config
+        - name: Test bash_config role
+          ansible.builtin.include_role:
+            name: bash_config
       check_mode: true
