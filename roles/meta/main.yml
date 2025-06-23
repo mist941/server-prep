@@ -1,0 +1,14 @@
+galaxy_info:
+  author: mist941
+  description: Role for setting up a server
+  company: mist941
+  license: MIT
+  min_ansible_version: '2.14'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - '22.04'
+        - '24.04'
+        - '26.04'
+  galaxy_tags: []
+dependencies: []

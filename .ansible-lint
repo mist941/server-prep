@@ -1,0 +1,12 @@
+profile: production
+
+exclude_paths:
+  - .cache/
+  - .github/
+
+skip_list:
+  - yaml[line-length]
+
+enable_list:
+  - fqcn-builtins
+  - no-changed-when

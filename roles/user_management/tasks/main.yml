@@ -18,6 +18,8 @@
     shell: /bin/bash
     create_home: true
     skeleton: /etc/skel
+  when: NEW_USER is defined
+  no_log: true
 
 - name: Create .ssh directory
   file:
