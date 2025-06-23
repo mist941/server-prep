@@ -70,7 +70,7 @@ check_prerequisites() {
   print_info "Checking prerequisites..."
 
   # Check if ansible is installed
-  if ! command -v ansible-playbook &>/dev/null; then
+  if ! command -v ansible-playbook &>/dev/null; then # &>/dev/null redirects stderr and stdout to /dev/null (specialized file for redirecting output)
     print_error "ansible-playbook is not installed. Please install Ansible first."
     exit 1
   fi
@@ -78,7 +78,7 @@ check_prerequisites() {
   # Check if required files exist
   local required_files=(".env" "inventory.ini" "playbook.yml")
   for file in "${required_files[@]}"; do
-    if [[ ! -f "$file" ]]; then
+    if [[ ! -f "$file" ]]; then # -f checks if the file exists
       print_error "Required file '$file' not found!"
       if [[ "$file" == ".env" ]]; then
         print_info "Please copy env.example to .env and configure it:"
@@ -96,25 +96,27 @@ load_environment() {
   print_info "Loading environment variables..."
 
   # Load environment variables
-  set -a
+  set -a # -a enables auto-export of all variables
   source .env
-  set +a
+  set +a # -a disables auto-export of all variables
 
   # Validate required environment variables
   local required_vars=("ANSIBLE_USER" "ANSIBLE_PASSWORD" "NEW_USER" "NEW_USER_PASSWORD" "SSH_PUB_KEY" "TIMEZONE")
   local missing_vars=()
 
   for var in "${required_vars[@]}"; do
-    if [[ -z "${!var:-}" ]]; then
-      missing_vars+=("$var")
+    if [[ -z "${!var:-}" ]]; then # -z checks if the variable is empty
+      missing_vars+=("$var")      # add the variable to the missing_vars array
     fi
   done
 
+  # -gt checks if the number of missing variables is greater than 0,
+  # #missing_vars[@] is the number of elements in the missing_vars array
   if [[ ${#missing_vars[@]} -gt 0 ]]; then
     print_error "Missing required environment variables:"
     printf '  - %s\n' "${missing_vars[@]}"
     print_info "Please check your .env file and ensure all variables are set."
-    exit 1
+    exit 1 # exit the script with a status code of 1
   fi
 
   print_success "Environment variables loaded successfully"
@@ -151,7 +153,7 @@ run_playbook() {
   print_info "Starting Ansible playbook execution..."
 
   # Execute the command
-  if eval "$ansible_cmd"; then
+  if eval "$ansible_cmd"; then # eval evaluates the command in the string and executes it
     print_success "Ansible playbook completed successfully!"
   else
     print_error "Ansible playbook failed with exit code $?"
@@ -166,7 +168,7 @@ main() {
   local dry_run="false"
 
   # Parse command line arguments
-  while [[ $# -gt 0 ]]; do
+  while [[ $# -gt 0 ]]; do # -gt checks if the number of arguments is greater than 0
     case $1 in
     -h | --help)
       show_usage
@@ -174,7 +176,7 @@ main() {
       ;;
     -v | --verbose)
       verbose="true"
-      shift
+      shift # shift moves the arguments to the left, so the next argument becomes the first argument
       ;;
     -d | --dry-run)
       dry_run="true"
