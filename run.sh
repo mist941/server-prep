@@ -185,7 +185,6 @@ main() {
       shift 2
       ;;
     --list-tags)
-      check_prerequisites
       list_tags
       exit 0
       ;;
