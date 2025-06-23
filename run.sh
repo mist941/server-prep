@@ -57,12 +57,12 @@ EOF
 list_tags() {
   print_info "Available tags in the playbook:"
   ansible-playbook -i inventory.ini playbook.yml --list-tags 2>/dev/null |
-    grep "TASK TAGS" |
-    sed 's/.*TASK TAGS: \[//' |
-    sed 's/\]//' |
-    tr ',' '\n' |
-    sort -u |
-    sed 's/^/  - /'
+    grep "TASK TAGS" |          # grep filters the output to only include lines that contain "TASK TAGS"
+    sed 's/.*TASK TAGS: \[//' | # sed replaces the first occurrence of "TASK TAGS: [" with an empty string
+    sed 's/\]//' |              # sed replaces the last occurrence of "]" with an empty string
+    tr ',' '\n' |               # tr replaces all occurrences of "," with a newline character
+    sort -u |                   # sort sorts the lines and removes duplicates
+    sed 's/^/  - /'             # sed replaces the first occurrence of "^" with "  - "
 }
 
 # Function to check prerequisites
