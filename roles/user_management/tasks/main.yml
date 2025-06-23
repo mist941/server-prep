@@ -1,14 +1,14 @@
 - name: Generate password hash
-  set_fact:
+  ansible.builtin.set_fact:
     hashed_password: "{{ NEW_USER_PASSWORD | password_hash('sha512') }}"
 
 - name: Create group
-  group:
+  ansible.builtin.group:
     name: admin
     state: present
 
 - name: Add user
-  user:
+  ansible.builtin.user:
     name: "{{ NEW_USER }}"
     state: present
     groups: [sudo, admin]
@@ -22,7 +22,7 @@
   no_log: true
 
 - name: Create .ssh directory
-  file:
+  ansible.builtin.file:
     path: "/home/{{ NEW_USER }}/.ssh"
     state: directory
     group: admin
@@ -30,7 +30,7 @@
     owner: "{{ NEW_USER }}"
 
 - name: Show SSH key
-  debug:
+  ansible.builtin.debug:
     var: SSH_PUB_KEY
 
 - name: Add SSH key to authorized_keys

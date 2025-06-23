@@ -1,0 +1,34 @@
+---
+namespace: mist941
+name: server_prep
+version: 1.0.0
+readme: README.md
+authors:
+  - mist941
+
+description: Ansible collection for initial server preparation and configuration
+
+license:
+  - MIT
+
+license_file: LICENSE
+
+tags:
+  - server
+  - configuration
+  - security
+  - setup
+  - ubuntu
+  - debian
+
+dependencies: {}
+
+repository: https://github.com/mist941/server-prep
+homepage: https://github.com/mist941/server-prep
+issues: https://github.com/mist941/server-prep/issues
+
+build_ignore:
+  - .git
+  - .vscode
+  - .env
+  - "*.tar.gz"

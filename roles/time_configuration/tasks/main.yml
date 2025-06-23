@@ -1,14 +1,14 @@
 - name: Set timezone to whatever set in the .env file
-  timezone:
+  community.general.timezone:
     name: "{{ TIMEZONE }}"
 
 - name: Install chrony for time synchronization
-  apt:
+  ansible.builtin.apt:
     name: chrony
     state: present
 
 - name: Enable and start chrony service
-  service:
+  ansible.builtin.service:
     name: chrony
     state: started
-    enabled: yes
+    enabled: true

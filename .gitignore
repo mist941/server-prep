@@ -1,2 +1,17 @@
-.vscode
+# Environment variables
 .env
+
+# Ansible
+*.retry
+.ansible/
+/tmp/ansible_facts_cache/
+/tmp/.ansible-cp/
+
+# IDE
+.vscode/
+
+# Logs
+*.log
+
+# Collection
+*.collection
