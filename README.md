@@ -1,61 +1,60 @@
 # Server Preparation Ansible Project
 
-Basic Ansible автоматизація для початкового налаштування серверів. Конфігурує основні компоненти такі як користувачі, SSH, оновлення системи та основні інструменти. Розроблено для роботи на різних Linux хостах.
+Basic Ansible automation for initial server setup. Configures essential components such as users, SSH, system updates, and common tools. Designed to work across various Linux hosts.
 
-## 🚀 Можливості
+## 🚀 Features
 
-- ✅ Оновлення системи та пакетів
-- ✅ Налаштування часового поясу та синхронізації часу
-- ✅ Управління користувачами з SSH ключами
-- ✅ Безпечна конфігурація SSH
-- ✅ Установка базових пакетів
-- ✅ Налаштування Vim з плагінами
-- ✅ Кастомізація bash prompt
+- ✅ System updates and package upgrades
+- ✅ Timezone and time synchronization configuration
+- ✅ User management with SSH keys
+- ✅ Secure SSH configuration
+- ✅ Essential packages installation
+- ✅ Vim setup with plugins
+- ✅ Custom bash prompt configuration
 
-## 📋 Вимоги
+## 📋 Requirements
 
 - **Ansible**: >= 2.14
-- **Підтримувані ОС**: Ubuntu 20.04+, Debian 11+
-- **Python**: >= 3.8
-- **Доступ**: SSH або початковий пароль доступ до цільових хостів
+- **Supported OS**: Ubuntu 20.04+, Debian 11+
+- **Access**: SSH or initial password access to target hosts
 
-## 🔧 Встановлення
+## 🔧 Installation
 
-1. **Клонування репозиторію:**
+1. **Clone the repository:**
 ```bash
 git clone <your-repo-url>
 cd server-prep
 ```
 
-2. **Встановлення необхідних колекцій:**
+2. **Install required collections:**
 ```bash
 ansible-galaxy collection install -r requirements.yml
 ```
 
-3. **Конфігурація змінних середовища:**
+3. **Configure environment variables:**
 ```bash
 cp env.example .env
-# Відредагуйте .env файл зі своїми значеннями
+# Edit the .env file with your values
 ```
 
-## ⚙️ Конфігурація
+## ⚙️ Configuration
 
-### Обов'язкові змінні середовища
+### Required Environment Variables
 
-Створіть файл `.env` з наступними змінними:
+Create a `.env` file with the following variables:
 
-| Змінна | Опис | Приклад |
-|--------|------|---------|
-| `ANSIBLE_USER` | Користувач для початкового підключення | `ubuntu` |
-| `ANSIBLE_PASSWORD` | Пароль для початкового підключення | `your_password` |
-| `NEW_USER` | Ім'я нового користувача | `admin` |
-| `NEW_USER_PASSWORD` | Пароль нового користувача | `secure_password` |
-| `SSH_PUB_KEY` | Зміст SSH публічного ключа | `ssh-rsa AAAAB3...` |
-| `TIMEZONE` | Часовий пояс | `Europe/Kiev` |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `ANSIBLE_USER` | User for initial connection | `ubuntu` |
+| `ANSIBLE_PASSWORD` | Password for initial connection | `your_password` |
+| `NEW_USER` | Name of the new user to create | `admin` |
+| `NEW_USER_PASSWORD` | Password for the new user | `secure_password` |
+| `SSH_PUB_KEY` | SSH public key content | `ssh-rsa AAAAB3...` |
+| `TIMEZONE` | Timezone | `Europe/Kiev` |
 
-### Налаштування inventory
+### Inventory Configuration
 
-Відредагуйте `inventory.ini` та додайте свої сервери:
+Edit `inventory.ini` and add your servers:
 
 ```ini
 [servers]
@@ -69,74 +68,74 @@ ansible_password={{ lookup('env', 'ANSIBLE_PASSWORD') }}
 ansible_become_password={{ lookup('env', 'ANSIBLE_PASSWORD') }}
 ```
 
-## 🚀 Використання
+## 🚀 Usage
 
-### Повне розгортання
+### Full Deployment
 ```bash
 ./run.sh
 ```
 
-### Вибіркове виконання за тегами
+### Selective Execution by Tags
 ```bash
-# Тільки оновлення системи
+# System updates only
 ./run.sh system,updates
 
-# Тільки налаштування SSH
+# SSH configuration only
 ./run.sh ssh
 
-# Налаштування користувачів та SSH
+# User and SSH configuration
 ./run.sh user,ssh
 ```
 
-### Перевірка без змін (dry-run)
+### Dry Run (Check mode)
 ```bash
 ansible-playbook -i inventory.ini playbook.yml --check
 ```
 
-## 🏗️ Структура проекту
+## 🏗️ Project Structure
 
 ```
-├── ansible.cfg                 # Конфігурація Ansible
-├── playbook.yml                # Головний playbook
-├── inventory.ini               # Інвентар хостів
-├── requirements.yml            # Залежності колекцій
-├── .ansible-lint              # Конфігурація linting
-├── env.example                # Приклад змінних середовища
-├── run.sh                     # Скрипт запуску
-└── roles/                     # Ролі Ansible
-    ├── system_updates/        # Оновлення системи
-    ├── time_configuration/    # Налаштування часу
-    ├── user_management/       # Управління користувачами
-    ├── ssh_setup/            # Конфігурація SSH
-    ├── packages_installation/ # Установка пакетів
-    ├── vim_setup/            # Налаштування Vim
-    └── bash_config/          # Конфігурація bash
+├── ansible.cfg                 # Ansible configuration
+├── playbook.yml                # Main playbook
+├── inventory.ini               # Host inventory
+├── requirements.yml            # Collection dependencies
+├── .ansible-lint              # Linting configuration
+├── env.example                # Environment variables example
+├── run.sh                     # Launch script
+└── roles/                     # Ansible roles
+    ├── system_updates/        # System updates
+    ├── time_configuration/    # Time configuration
+    ├── user_management/       # User management
+    ├── ssh_setup/            # SSH configuration
+    ├── packages_installation/ # Package installation
+    ├── vim_setup/            # Vim configuration
+    └── bash_config/          # Bash configuration
 ```
 
-## 🏷️ Доступні теги
+## 🏷️ Available Tags
 
-| Тег | Опис |
-|-----|------|
-| `system`, `updates` | Оновлення системи |
-| `time` | Налаштування часового поясу |
-| `user` | Управління користувачами |
-| `ssh` | Конфігурація SSH |
-| `packages` | Установка пакетів |
-| `vim` | Налаштування Vim |
-| `bash` | Конфігурація bash |
+| Tag | Description |
+|-----|-------------|
+| `system`, `updates` | System updates |
+| `time` | Timezone configuration |
+| `user` | User management |
+| `ssh` | SSH configuration |
+| `packages` | Package installation |
+| `vim` | Vim configuration |
+| `bash` | Bash configuration |
 
-## 🔒 Безпека
+## 🔒 Security
 
-- SSH root логін відключений
-- Аутентифікація за паролем відключена
-- Увімкнено тільки аутентифікацію за ключами
-- Паролі користувачів хешуються з SHA512
-- Конфіденційні дані не логуються
+- SSH root login disabled
+- Password authentication disabled
+- Key-based authentication only
+- User passwords hashed with SHA512
+- Sensitive data not logged
 
-## 📝 Ліцензія
+## 📝 License
 
-Цей проект ліцензований під MIT License - дивіться файл [LICENSE](LICENSE) для деталей.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**⚠️ Важливо**: Завжди тестуйте на не-продакшн серверах перед використанням у виробничому середовищі!
+**⚠️ Important**: Always test on non-production servers before using in production environments!
