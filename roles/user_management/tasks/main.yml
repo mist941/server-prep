@@ -1,27 +1,33 @@
-- name: Generate password hash
+- name: "🔐 Generate secure password hash"
   ansible.builtin.set_fact:
     hashed_password: "{{ NEW_USER_PASSWORD | password_hash('sha512') }}"
+  no_log: true
 
-- name: Create group
+- name: "👥 Create admin group"
   ansible.builtin.group:
     name: admin
     state: present
 
-- name: Add user
+- name: "👤 Create new user: {{ NEW_USER }}"
   ansible.builtin.user:
     name: "{{ NEW_USER }}"
     state: present
     groups: [sudo, admin]
     append: true
     password: "{{ hashed_password }}"
-    comment: ""
+    comment: "Admin user created by Ansible"
     shell: /bin/bash
     create_home: true
     skeleton: /etc/skel
   when: NEW_USER is defined
   no_log: true
+  register: user_creation_result
 
-- name: Create .ssh directory
+- name: "✅ User creation status"
+  ansible.builtin.debug:
+    msg: "User {{ NEW_USER }} {{ 'created' if user_creation_result.changed else 'already exists' }}"
+
+- name: "🔒 Create .ssh directory"
   ansible.builtin.file:
     path: "/home/{{ NEW_USER }}/.ssh"
     state: directory
@@ -29,12 +35,13 @@
     mode: '0700'
     owner: "{{ NEW_USER }}"
 
-- name: Show SSH key
-  ansible.builtin.debug:
-    var: SSH_PUB_KEY
-
-- name: Add SSH key to authorized_keys
+- name: "🔑 Add SSH public key to authorized_keys"
   ansible.posix.authorized_key:
     user: "{{ NEW_USER }}"
     key: "{{ SSH_PUB_KEY }}"
     state: present
+  register: ssh_key_result
+
+- name: "🔓 SSH key installation status"
+  ansible.builtin.debug:
+    msg: "SSH key {{ 'added' if ssh_key_result.changed else 'already present' }} for user {{ NEW_USER }}"

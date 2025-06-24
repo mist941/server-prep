@@ -53,6 +53,81 @@ AVAILABLE TAGS:
 EOF
 }
 
+show_progress() {
+  local duration=${1}
+  already_done() { for ((done = 0; done < $elapsed; done++)); do printf "▇"; done; }
+  remaining() { for ((remain = $elapsed; remain < $duration; remain++)); do printf " "; done; }
+  percentage() { printf "| %s%%" $(((($elapsed) * 100) / ($duration) * 100 / 100)); }
+  clean_line() { printf "\r"; }
+
+  for ((elapsed = 1; elapsed <= $duration; elapsed++)); do
+    already_done
+    remaining
+    percentage
+    sleep 1
+    clean_line
+  done
+  clean_line
+}
+
+show_banner() {
+  cat <<'EOF'
+╔══════════════════════════════════════════════════════════════════╗
+║                    🚀 Server Preparation Tool 🚀                 ║
+║                      Powered by Ansible                         ║
+╚══════════════════════════════════════════════════════════════════╝
+EOF
+}
+
+show_summary() {
+  local start_time="$1"
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+
+  cat <<EOF
+
+╔══════════════════════════════════════════════════════════════════╗
+║                        🎉 EXECUTION SUMMARY                      ║
+║                                                                  ║
+║  Duration: ${duration} seconds                                   ║
+║  Status: SUCCESS ✅                                             ║
+║  Time: $(date)                                                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+EOF
+}
+
+show_step() {
+  local step_number="$1"
+  local total_steps="$2"
+  local step_name="$3"
+
+  echo ""
+  print_info "Step ${step_number}/${total_steps}: ${step_name}"
+  printf "Progress: ["
+  for ((i = 1; i <= step_number; i++)); do printf "█"; done
+  for ((i = step_number + 1; i <= total_steps; i++)); do printf "░"; done
+  printf "] %d%%\n" $((step_number * 100 / total_steps))
+  echo ""
+}
+
+show_execution_time() {
+  local start_time="$1"
+  local end_time=$(date +%s)
+  local duration=$((end_time - start_time))
+  local hours=$((duration / 3600))
+  local minutes=$(((duration % 3600) / 60))
+  local seconds=$((duration % 60))
+
+  if [[ $hours -gt 0 ]]; then
+    printf "⏱️  Execution time: %dh %dm %ds\n" $hours $minutes $seconds
+  elif [[ $minutes -gt 0 ]]; then
+    printf "⏱️  Execution time: %dm %ds\n" $minutes $seconds
+  else
+    printf "⏱️  Execution time: %ds\n" $seconds
+  fi
+}
+
 # Function to list available tags
 list_tags() {
   print_info "Available tags in the playbook:"
@@ -166,6 +241,10 @@ main() {
   local tags=""
   local verbose="false"
   local dry_run="false"
+  local start_time=$(date +%s)
+  local total_steps=4
+
+  show_banner
 
   # Parse command line arguments
   while [[ $# -gt 0 ]]; do # -gt checks if the number of arguments is greater than 0
@@ -205,10 +284,20 @@ main() {
     esac
   done
 
-  # Run the main workflow
+  show_step 1 $total_steps "Checking prerequisites"
   check_prerequisites
+
+  show_step 2 $total_steps "Loading environment variables"
   load_environment
+
+  show_step 3 $total_steps "Preparing for execution"
+  show_progress 3
+
+  show_step 4 $total_steps "Running Ansible playbook"
   run_playbook "$tags" "$verbose" "$dry_run"
+
+  show_execution_time "$start_time"
+  show_summary "$start_time"
 }
 
 # Run main function with all arguments
