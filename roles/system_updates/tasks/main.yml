@@ -1,8 +1,26 @@
-- name: Update apt
+- name: "📦 Update package cache"
   ansible.builtin.apt:
     update_cache: true
+    cache_valid_time: 3600
+  register: apt_update_result
 
-- name: Upgrade all packages
+- name: "📈 Display update information"
+  ansible.builtin.debug:
+    msg: "Package cache updated successfully"
+  when: apt_update_result is succeeded
+
+- name: "⬆️ Upgrade all packages to latest versions"
   ansible.builtin.apt:
     upgrade: dist
     state: latest
+    autoremove: true
+    autoclean: true
+  register: apt_upgrade_result
+
+- name: "📊 Display upgrade summary"
+  ansible.builtin.debug:
+    msg: |
+      Packages upgrade completed:
+      - Changed: {{ apt_upgrade_result.changed }}
+      - Stdout lines: {{ apt_upgrade_result.stdout_lines | length if apt_upgrade_result.stdout_lines else 0 }}
+  when: apt_upgrade_result is defined
