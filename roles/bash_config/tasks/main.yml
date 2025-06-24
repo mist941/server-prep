@@ -1,7 +1,46 @@
-- name: Add custom bash prompt configuration
+- name: "🏠 Verify user home directory exists"
+  ansible.builtin.stat:
+    path: "/home/{{ NEW_USER }}"
+  register: home_dir_stat
+
+- name: "📁 Home directory status"
+  ansible.builtin.debug:
+    msg: "Home directory /home/{{ NEW_USER }} {{ 'exists' if home_dir_stat.stat.exists else 'does not exist' }}"
+
+- name: "📝 Backup existing .bashrc if present"
+  ansible.builtin.copy:
+    src: "/home/{{ NEW_USER }}/.bashrc"
+    dest: "/home/{{ NEW_USER }}/.bashrc.backup.{{ ansible_date_time.epoch }}"
+    remote_src: true
+    owner: "{{ NEW_USER }}"
+    group: admin
+    mode: '0644'
+  when: home_dir_stat.stat.exists
+  ignore_errors: true
+  register: bashrc_backup_result
+
+- name: "💾 Backup status"
+  ansible.builtin.debug:
+    msg: "Existing .bashrc {{ 'backed up successfully' if bashrc_backup_result.changed else 'backup not needed' }}"
+  when: bashrc_backup_result is defined
+
+- name: "🎨 Add custom colorful bash prompt configuration"
   ansible.builtin.lineinfile:
     path: "/home/{{ NEW_USER }}/.bashrc"
-    line: 'export PS1="-[\[$(tput sgr0)\]\[\033[38;5;10m\]\d\[$(tput sgr0)\]-\[$(tput sgr0)\]\[\033[38;5;10m\]\t\[$(tput sgr0)\]]-[\[$(tput sgr0)\]\[\033[38;5;214m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\h\[$(tput sgr0)\]]-\n-[\[$(tput sgr0)\]\[\033[38;5;33m\]\w\[$(tput sgr0)\]]\\$ \[$(tput sgr0)\]"'
+    line: |
+      # Custom colorful prompt - added by Ansible
+      export PS1="-[\[$(tput sgr0)\]\[\033[38;5;10m\]\d\[$(tput sgr0)\]-\[$(tput sgr0)\]\[\033[38;5;10m\]\t\[$(tput sgr0)\]]-[\[$(tput sgr0)\]\[\033[38;5;214m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\h\[$(tput sgr0)\]]-\n-[\[$(tput sgr0)\]\[\033[38;5;33m\]\w\[$(tput sgr0)\]]\\$ \[$(tput sgr0)\]"
     state: present
     create: true
     backup: true
+    owner: "{{ NEW_USER }}"
+    group: admin
+    mode: '0644'
+  register: prompt_config_result
+
+- name: "⚡ Bash configuration status"
+  ansible.builtin.debug:
+    msg: |
+      Bash configuration completed:
+      - Custom prompt: {{ 'configured' if prompt_config_result.changed else 'already set' }}
+      - Configuration file: /home/{{ NEW_USER }}/.bashrc
