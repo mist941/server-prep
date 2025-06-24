@@ -42,8 +42,8 @@
   ansible.builtin.debug:
     msg: |
       Package installation completed:
-      - Total packages processed: {{ packages_result.cache_updated_time if packages_result.cache_updated_time else 'N/A' }}
-      - Changed: {{ packages_result.changed }}
+      - Packages changed: {{ packages_result.changed }}
+      - Installation status: {{ 'success' if packages_result.changed is defined else 'completed' }}
       - All packages are now installed and ready to use!
 
 - name: "🔧 Verify installation of key packages"
