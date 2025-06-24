@@ -1,14 +1,50 @@
-- name: Set timezone
+- name: "🕒 Display current system time before configuration"
+  ansible.builtin.debug:
+    msg: |
+      Current system information:
+      - Date: {{ ansible_date_time.date }}
+      - Time: {{ ansible_date_time.time }}
+      - Current timezone: {{ ansible_date_time.tz }}
+      - Target timezone: {{ TIMEZONE }}
+
+- name: "🌍 Set timezone to {{ TIMEZONE }}"
   community.general.timezone:
     name: "{{ TIMEZONE }}"
+  register: timezone_result
 
-- name: Install chrony for time synchronization
+- name: "✅ Timezone configuration status"
+  ansible.builtin.debug:
+    msg: "Timezone {{ 'changed to' if timezone_result.changed else 'already set to' }} {{ TIMEZONE }}"
+
+- name: "⏱️ Install chrony for time synchronization"
   ansible.builtin.apt:
     name: chrony
     state: present
+    update_cache: true
+  register: chrony_install_result
 
-- name: Enable and start chrony service
+- name: "📦 Chrony installation status"
+  ansible.builtin.debug:
+    msg: "Chrony {{ 'installed successfully' if chrony_install_result.changed else 'already installed' }}"
+
+- name: "🔄 Enable and start chrony service"
   ansible.builtin.service:
     name: chrony
     state: started
     enabled: true
+  register: chrony_service_result
+
+- name: "⚡ Chrony service status"
+  ansible.builtin.debug:
+    msg: |
+      Chrony service configuration:
+      - Service state: {{ 'started' if chrony_service_result.changed else 'already running' }}
+      - Boot enabled: {{ 'yes' if chrony_service_result.enabled else 'no' }}
+
+- name: "🕐 Display updated system time"
+  ansible.builtin.debug:
+    msg: |
+      Updated system information:
+      - Current date: {{ ansible_date_time.date }}
+      - Current time: {{ ansible_date_time.time }}
+      - Active timezone: {{ ansible_date_time.tz }}
