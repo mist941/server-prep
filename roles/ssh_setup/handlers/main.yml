@@ -1,4 +1,14 @@
 - name: Restart SSH service
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted
+  register: ssh_restart_result
+  
+- name: Display SSH restart status
+  ansible.builtin.debug:
+    msg: |
+      🔄 SSH service restart completed:
+      - Status: {{ 'successful' if ssh_restart_result.state == 'started' else 'failed' }}
+      - Service is now running with new security configuration
+      - Connection should remain active for current session
+  when: ssh_restart_result is defined

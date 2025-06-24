@@ -1,9 +1,66 @@
-- name: Install packages
+- name: "📦 Display packages to be installed"
+  ansible.builtin.debug:
+    msg: |
+      Installing essential packages:
+      - htop: System monitoring tool
+      - git: Version control system
+      - curl: Command line HTTP client
+      - tmux: Terminal multiplexer
+      - tree: Directory structure viewer
+      - wget: Download utility
+      - unzip: Archive extraction tool
+      - net-tools: Network configuration tools
+
+- name: "🔄 Update package cache"
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  register: cache_update_result
+
+- name: "💾 Package cache status"
+  ansible.builtin.debug:
+    msg: "Package cache {{ 'updated successfully' if cache_update_result.changed else 'is up to date' }}"
+
+- name: "📥 Install essential system packages"
   ansible.builtin.apt:
     name: 
       - htop
       - git
       - curl
       - tmux
+      - tree
+      - wget
+      - unzip
+      - net-tools
+      - vim-common
+      - software-properties-common
     state: present
-    update_cache: true
+    install_recommends: false
+  register: packages_result
+
+- name: "📊 Package installation summary"
+  ansible.builtin.debug:
+    msg: |
+      Package installation completed:
+      - Total packages processed: {{ packages_result.cache_updated_time if packages_result.cache_updated_time else 'N/A' }}
+      - Changed: {{ packages_result.changed }}
+      - All packages are now installed and ready to use!
+
+- name: "🔧 Verify installation of key packages"
+  ansible.builtin.command: "which {{ item }}"
+  loop:
+    - htop
+    - git
+    - curl
+    - tmux
+  register: package_verification
+  changed_when: false
+  ignore_errors: true
+
+- name: "✅ Package verification results"
+  ansible.builtin.debug:
+    msg: |
+      Package verification completed:
+      {% for result in package_verification.results %}
+      - {{ result.item }}: {{ 'installed' if result.rc == 0 else 'not found' }}
+      {% endfor %}

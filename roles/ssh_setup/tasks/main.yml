@@ -1,18 +1,83 @@
-- name: Configure secure SSH configuration
+- name: "🔒 Display current SSH security settings"
+  ansible.builtin.debug:
+    msg: |
+      Configuring SSH for enhanced security:
+      - Disabling root login
+      - Disabling password authentication
+      - Enabling public key authentication only
+      - Disabling challenge-response authentication
+      - Disabling PAM authentication
+
+- name: "📋 Backup current SSH configuration"
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config
+    dest: "/etc/ssh/sshd_config.backup.{{ ansible_date_time.epoch }}"
+    remote_src: true
+    mode: '0600'
+  register: ssh_backup_result
+
+- name: "💾 SSH config backup status"
+  ansible.builtin.debug:
+    msg: "SSH configuration {{ 'backed up successfully' if ssh_backup_result.changed else 'backup failed' }}"
+
+- name: "🔐 Configure secure SSH settings"
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: present
+    backup: false
   loop:
-    - regexp: "^PermitRootLogin"
+    - regexp: "^#?PermitRootLogin"
       line: "PermitRootLogin no"
-    - regexp: "^PasswordAuthentication"
+    - regexp: "^#?PasswordAuthentication"
       line: "PasswordAuthentication no"
-    - regexp: "^ChallengeResponseAuthentication"
+    - regexp: "^#?ChallengeResponseAuthentication"
       line: "ChallengeResponseAuthentication no"
-    - regexp: "^UsePAM"
+    - regexp: "^#?UsePAM"
       line: "UsePAM no"
-    - regexp: "^PubkeyAuthentication"
+    - regexp: "^#?PubkeyAuthentication"
       line: "PubkeyAuthentication yes"
+    - regexp: "^#?MaxAuthTries"
+      line: "MaxAuthTries 3"
+    - regexp: "^#?LoginGraceTime"
+      line: "LoginGraceTime 60"
+  register: ssh_config_result
   notify: Restart SSH service
+
+- name: "🛡️ SSH security configuration status"
+  ansible.builtin.debug:
+    msg: |
+      SSH security configuration:
+      - Root login: DISABLED ❌
+      - Password authentication: DISABLED ❌
+      - Public key authentication: ENABLED ✅
+      - Challenge-response auth: DISABLED ❌
+      - PAM authentication: DISABLED ❌
+      - Max auth tries: 3
+      - Login grace time: 60 seconds
+
+- name: "🔍 Validate SSH configuration syntax"
+  ansible.builtin.command: sshd -t
+  register: ssh_syntax_check
+  changed_when: false
+  failed_when: ssh_syntax_check.rc != 0
+
+- name: "✅ SSH configuration validation"
+  ansible.builtin.debug:
+    msg: "SSH configuration syntax is valid ✅"
+  when: ssh_syntax_check.rc == 0
+
+- name: "🚪 Display SSH service status"
+  ansible.builtin.service_facts:
+
+- name: "📊 SSH service information"
+  ansible.builtin.debug:
+    msg: |
+      SSH service status:
+      - Service name: ssh/sshd
+      - Current state: {{ ansible_facts.services['ssh.service'].state | default('unknown') }}
+      - Enabled: {{ ansible_facts.services['ssh.service'].status | default('unknown') }}
+      
+      ⚠️  Important: SSH will be restarted to apply security changes!
+      ⚠️  Make sure your SSH key is properly configured before restart!
