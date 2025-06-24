@@ -1,4 +1,4 @@
-- name: Set timezone to whatever set in the .env file
+- name: Set timezone
   community.general.timezone:
     name: "{{ TIMEZONE }}"
 
