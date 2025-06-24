@@ -1,5 +1,21 @@
 - name: Prepare the server
   hosts: all
+  gather_facts: true
+  
+  pre_tasks:
+    - name: "📋 Display server information"
+      ansible.builtin.debug:
+        msg: |
+          Starting server preparation for: {{ inventory_hostname }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Kernel: {{ ansible_kernel }}
+          Architecture: {{ ansible_architecture }}
+      tags: ['always']
+    
+    - name: "⏰ Record start time"
+      ansible.builtin.set_fact:
+        playbook_start_time: "{{ ansible_date_time.iso8601 }}"
+      tags: ['always']
 
   roles:
     - { role: system_updates, tags: ['system', 'updates']}
@@ -10,6 +26,16 @@
     - { role: packages_installation, tags: ['packages']}
     - { role: ssh_setup, tags: ['ssh']}
 
+  post_tasks:
+    - name: "✅ Server preparation completed"
+      ansible.builtin.debug:
+        msg: |
+          🎉 Server preparation completed successfully!
+          Started: {{ playbook_start_time }}
+          Completed: {{ ansible_date_time.iso8601 }}
+          Server: {{ inventory_hostname }}
+      tags: ['always']
+      
   vars:
     ANSIBLE_USER: "{{ lookup('env', 'ANSIBLE_USER') }}"
     ANSIBLE_PASSWORD: "{{ lookup('env', 'ANSIBLE_PASSWORD') }}"
