@@ -1,56 +1,95 @@
-- name: Check if vim is installed
+- name: "🔍 Check if vim is already installed"
   ansible.builtin.command: which vim
   register: vim_check
   ignore_errors: true
   changed_when: false
 
-- name: Install vim
+- name: "📊 Vim installation status"
+  ansible.builtin.debug:
+    msg: "Vim {{ 'is already installed' if vim_check.rc == 0 else 'needs to be installed' }}"
+
+- name: "📦 Install vim text editor"
   ansible.builtin.package:
     name: vim
     state: present
+    update_cache: true
   when: vim_check.rc != 0
+  register: vim_install_result
 
-- name: Create .vim directory
-  ansible.builtin.file:
-    path: "/home/{{ NEW_USER }}/.vim"
-    state: directory
-    mode: '0700'
-    owner: "{{ NEW_USER }}"
-    group: admin
+- name: "✅ Vim installation result"
+  ansible.builtin.debug:
+    msg: "Vim {{ 'installed successfully' if vim_install_result.changed else 'was already installed' }}"
 
-- name: Create autoload directory
+- name: "📁 Create .vim directory structure"
   ansible.builtin.file:
-    path: "/home/{{ NEW_USER }}/.vim/autoload"
+    path: "{{ item }}"
     state: directory
-    owner: "{{ NEW_USER }}"
-    group: admin
     mode: '0755'
+    owner: "{{ NEW_USER }}"
+    group: admin
+  loop:
+    - "/home/{{ NEW_USER }}/.vim"
+    - "/home/{{ NEW_USER }}/.vim/autoload"
+    - "/home/{{ NEW_USER }}/.vim/plugged"
+  register: vim_dirs_result
 
-- name: Download VimPlug
+- name: "📂 Directory creation status"
+  ansible.builtin.debug:
+    msg: "Vim directories created successfully in /home/{{ NEW_USER }}/.vim"
+
+- name: "⬇️ Download VimPlug plugin manager"
   ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     dest: "/home/{{ NEW_USER }}/.vim/autoload/plug.vim"
     owner: "{{ NEW_USER }}"
     group: admin
     mode: '0644'
+    timeout: 30
+  register: vimplug_download_result
 
-- name: Create custom .vimrc for {{ NEW_USER }} user
+- name: "🔌 VimPlug download status"
+  ansible.builtin.debug:
+    msg: "VimPlug {{ 'downloaded successfully' if vimplug_download_result.changed else 'already present' }}"
+
+- name: "⚙️ Create custom .vimrc configuration for {{ NEW_USER }}"
   ansible.builtin.template:
     src: vimrc.j2
     dest: "/home/{{ NEW_USER }}/.vimrc"
     owner: "{{ NEW_USER }}"
     group: admin
     mode: '0644'
+    backup: true
+  register: vimrc_user_result
 
-- name: Create vim configuration for sudo
+- name: "🔧 Create system-wide vim configuration"
   ansible.builtin.template:
     src: vimrc.j2
     dest: /etc/vim/vimrc.local
     mode: '0644'
+    backup: true
+  register: vimrc_system_result
 
-- name: Install Vim plugins
-  ansible.builtin.command: vim +PlugInstall +qall
+- name: "📝 Vim configuration status"
+  ansible.builtin.debug:
+    msg: |
+      Vim configuration completed:
+      - User config (.vimrc): {{ 'created' if vimrc_user_result.changed else 'already exists' }}
+      - System config: {{ 'created' if vimrc_system_result.changed else 'already exists' }}
+
+- name: "🔌 Install vim plugins"
+  ansible.builtin.shell: |
+    vim +PlugInstall +qall
   args:
-    creates: "/home/{{ NEW_USER }}/.vim/plugged"
+    creates: "/home/{{ NEW_USER }}/.vim/plugged/gruvbox"
   become_user: "{{ NEW_USER }}"
-  changed_when: false
+  environment:
+    HOME: "/home/{{ NEW_USER }}"
+  register: plugins_install_result
+  ignore_errors: true
+
+- name: "🎨 Vim plugins installation status"
+  ansible.builtin.debug:
+    msg: |
+      Vim plugins installation:
+      - Status: {{ 'completed successfully' if plugins_install_result.rc == 0 else 'completed with some issues' }}
+      - Plugins location: /home/{{ NEW_USER }}/.vim/plugged/
